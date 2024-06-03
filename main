@@ -1,0 +1,67 @@
+//create canvas element
+const canvas = document.createElement( "canvas" );
+canvas.width = 700;
+canvas.height = 500;
+canvas.style.borderStyle = "solid";
+document.body.appendChild( canvas );
+
+//get context
+const ctx = canvas.getContext( "2d" );
+
+//scene function
+function fillScene( color ) {
+	ctx.fillStyle = color;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+//physics engine
+var psx = {
+	gravity : 0.5,
+    ground : 450
+}
+var psxObjects = [  ];
+
+//entity creation function
+function createPsxNode ( width, height, color, posX, posY ) {
+	var node = {
+    	w : width,
+        h : height,
+        c : color,
+        x : posX,
+        y : posY,
+        yVelocity : 0,
+    }
+    return node;
+}
+
+//entity addition function
+function addPsxNode ( node ) {
+	psxObjects.push( node );
+}
+
+//game update
+function update() {
+    //draw bg
+    fillScene("white");
+
+    //physics update - loop through added entities and apply gravity
+    for (let i = 0; i < psxObjects.length; i++) {
+        psxObjects[i].y += psxObjects[i].yVelocity;
+        if (psxObjects[i].y + psxObjects[i].h >= psx.ground) {
+            psxObjects[i].y = psx.ground - psxObjects[i].h; // Adjust position to stay on the ground
+            psxObjects[i].yVelocity = 0;
+        } else {
+            psxObjects[i].yVelocity += psx.gravity;
+        }
+    }
+
+    //draw psxObjects
+    for (let i = 0; i < psxObjects.length; i++) {
+        ctx.fillStyle = psxObjects[i].c;
+        ctx.fillRect(psxObjects[i].x, psxObjects[i].y, psxObjects[i].w, psxObjects[i].h);
+    }
+
+    //rAF callback
+    requestAnimationFrame(update);
+}
+update();
